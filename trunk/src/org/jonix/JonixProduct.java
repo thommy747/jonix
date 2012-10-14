@@ -16,7 +16,22 @@ import org.jonix.composites.Serieses;
 import org.jonix.composites.Subjects;
 import org.jonix.composites.SupplyDetails;
 import org.jonix.composites.Titles;
+import org.jonix.mappers.IProductMapper;
 
+/**
+ * Container for an ONIX's <code>PRODUCT</code> tag, consisting of only the fields considered important by Jonix. This object is being populated by a
+ * package-dependent implementation of {@link IProductMapper}. Its members are divided into two groups, following ONIX terminology - <b>Elements</b> and
+ * <b>Composites</b>:
+ * <ul>
+ * <li>Elements are single-value tags, typically located directly under <code>PRODUCT</code>, and they are represented by a Java primitive
+ * <li>Composites are basically <code>List</code>s of objects, some of which may also be lists. They represent repeatable ONIX tags.
+ * </ul>
+ * In order to prevent this already-cumbersome structure from becoming even more cumbersome to use, getters and setters are not used, and members are accessible
+ * directly. This does not create a risk, as once this object is populated, it's in the sole hands of the user to read and write.
+ * 
+ * @author Zach Melamed
+ * 
+ */
 public class JonixProduct
 {
 	// elements

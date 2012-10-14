@@ -31,15 +31,15 @@ public class HeaderMapper implements IHeaderMapper
 			if (parent instanceof Header && grandParent == null)
 			{
 				if (o instanceof FromCompany)
-					header.FromCompany = ((FromCompany) o).getValue();
+					header.fromCompany = ((FromCompany) o).getValue();
 				if (o instanceof FromPerson)
-					header.FromPerson = ((FromPerson) o).getValue();
+					header.fromPerson = ((FromPerson) o).getValue();
 				if (o instanceof FromEmail)
-					header.FromEmail = ((FromEmail) o).getValue();
+					header.fromEmail = ((FromEmail) o).getValue();
 				if (o instanceof ToCompany)
-					header.ToCompany = ((ToCompany) o).getValue();
+					header.toCompany = ((ToCompany) o).getValue();
 				if (o instanceof SentDate)
-					header.SentDate = ((SentDate) o).getValue();
+					header.sentDate = ((SentDate) o).getValue();
 			}
 			return false; // we are currently not processing header composites, so no need to drill down
 		}

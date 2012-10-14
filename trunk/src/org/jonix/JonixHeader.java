@@ -1,14 +1,25 @@
 package org.jonix;
 
+import org.jonix.mappers.IHeaderMapper;
+
+/**
+ * Container for an ONIX's <code>HEADER</code> tag, consisting of only the fields considered important by Jonix. This object is being populated by a
+ * package-dependent implementation of {@link IHeaderMapper}. Unlike {@link JonixProduct}, the class' members are all Elements (no Composites at this stage),
+ * and are represented by Java primitives. However, similarly to {@link JonixProduct}, here, too, getters and setters are not used, and members are accessible
+ * directly.
+ * 
+ * @author Zach Melamed
+ * 
+ */
 public class JonixHeader
 {
 	// elements
-	public String FromCompany;
-	public String FromPerson;
-	public String FromEmail;
-	public String ToCompany;
-	public String SentDate;
-	
+	public String fromCompany;
+	public String fromPerson;
+	public String fromEmail;
+	public String toCompany;
+	public String sentDate;
+
 	@Override
 	public String toString()
 	{
@@ -19,15 +30,15 @@ public class JonixHeader
 
 	private void appendElements(StringBuilder sb)
 	{
-		if (FromCompany != null)
-			sb.append("FromCompany: ").append(FromCompany).append("\n");
-		if (FromPerson != null)
-			sb.append("FromPerson: ").append(FromPerson).append("\n");
-		if (FromEmail != null)
-			sb.append("FromEmail: ").append(FromEmail).append("\n");
-		if (ToCompany != null)
-			sb.append("ToCompany: ").append(ToCompany).append("\n");
-		if (SentDate != null)
-			sb.append("SentDate: ").append(SentDate).append("\n");
+		if (fromCompany != null)
+			sb.append("FromCompany: ").append(fromCompany).append("\n");
+		if (fromPerson != null)
+			sb.append("FromPerson: ").append(fromPerson).append("\n");
+		if (fromEmail != null)
+			sb.append("FromEmail: ").append(fromEmail).append("\n");
+		if (toCompany != null)
+			sb.append("ToCompany: ").append(toCompany).append("\n");
+		if (sentDate != null)
+			sb.append("SentDate: ").append(sentDate).append("\n");
 	}
 }
