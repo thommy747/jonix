@@ -1,0 +1,15 @@
+#summary Jonix - ONIX made simple with Java
+
+= Introduction =
+
+ONIX is an XML-based standard for products meta-data (particularly e-books). It is extremely detailed and flexible, making it difficult to work with in batch processes of meta-data analysis (such as attaining latest prices, book categories, sales rights, etc). On top of all that there are several flavors of the ONIX standards, REFERENCE vs SHORT tags, and Onix2 vs Onix3 generation.
+
+
+= Details =
+
+Jonix is focused on the most important and commonly used fields in ONIX (however, extending it to support more fields is fairly trivial). You provide it with an ONIX file (or an an ONIX folder of files), and it responds by firing events, each for the next product (e-book) described within the files(s). Each event serves you with a Java object containing the parsed information.
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
