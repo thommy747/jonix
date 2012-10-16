@@ -13,7 +13,7 @@ If have an ONIX file with *Short* tag-names, which you wish to convert into an e
   {{{
 cd "<folder-where-the-above-files-are>"
 
-java -jar saxon9.jar "<my-short-onix.xml>" "switch-onix-tagnames-2.0.xsl" result-document="<my-output-onix.xml>"
+java -jar saxon9.jar "<my-short-onix.xml>" switch-onix-tagnames-2.0.xsl result-document="<my-output-onix.xml>"
   }}}
 
 = Comments =
