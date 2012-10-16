@@ -6,8 +6,8 @@ If have an ONIX file with *Short* tag-names, which you wish to convert into an e
 
   * Create a folder containing the following files:
     # the Short-tagnamed ONIX file you wish to convert
-    # the file [http://www.editeur.org/files/ONIX%203/switch-onix-tagnames-2.0.xsl switch-onix-tagnames-2.0.xsl]
-    # the library [http://www.java2s.com/Code/JarDownload/saxon9/saxon9.jar.zip Saxon9.jar]
+    # the XSLT file [http://www.editeur.org/files/ONIX%203/switch-onix-tagnames-2.0.xsl switch-onix-tagnames-2.0.xsl]
+    # the java library [http://www.java2s.com/Code/JarDownload/saxon9/saxon9.jar.zip Saxon9.jar]
 
   * In a command line, execute:
   {{{
