@@ -18,7 +18,7 @@ Using JAXB, all tags in an ONIX file are de-serialized (a.k.a unmarshalled) into
 </bindings>
 }}}
   # choose an output folder, into which all Java-generated files will be output
-  # choose a package name for these Java files, for instance: `org.editeur.onix.v21.references`
+  # choose a package name for these output Java files, for instance: `org.editeur.onix.v21.references`
   # In a command line, execute:
 {{{
 cd "<XSD_HOME>"
