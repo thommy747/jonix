@@ -1,6 +1,6 @@
 #summary HOWTO: Convert Short tag-names into Reference tag-names
 
-If have an ONIX file with *Short* tag-names, which you want to convert into the *Reference* tag-names equivalent, you can use the XSLT script provided by EDItEUR as explained [http://www.editeur.org/15/Previous-Releases/#tagname here].
+If have an ONIX file with *Short* tag-names, which you wish to convert into an equivalent *Reference* tag-named file, you can use the XSLT script provided by EDItEUR as explained [http://www.editeur.org/15/Previous-Releases/#tagname here].
 
 = Steps =
 
