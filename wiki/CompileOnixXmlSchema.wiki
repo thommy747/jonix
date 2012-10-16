@@ -1,0 +1,20 @@
+#summary Generate JAXB-annotated Classes from ONIX Xml Schema
+
+Into...
+
+= Steps =
+  # Download the latest JAXB reference implementation (in a zip file) from [http://jaxb.java.net here]
+  # Extract the zip file into a folder we'll refer to as *`JAXB_HOME`*
+  # Make sure that in the folder *`JAXB_HOME\bin`* is a file named *`xjc.bat`*
+  # 
+
+[http://www.editeur.org/93/Release-3.0-Downloads/#Schema defs]
+
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
