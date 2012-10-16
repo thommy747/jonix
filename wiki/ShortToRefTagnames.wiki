@@ -18,5 +18,5 @@ java -jar saxon9.jar "<my-short-onix.xml>" switch-onix-tagnames-2.0.xsl result-d
 
 = Comments =
 
-  * These steps apply to ONIX version 2.x
+  * This guide applies to ONIX version 2.x
   * Internet connection is required
