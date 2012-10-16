@@ -10,7 +10,7 @@ Using JAXB, all tags in an ONIX file are de-serialized (a.k.a unmarshalled) into
     * For ONIX 2, download [http://www.editeur.org/files/ONIX%202.1/ONIX_for_Books_Release2-1_rev03_schema+codes_Issue_18.zip this zip]
     * For ONIX 3, download [http://www.editeur.org/files/ONIX%203/ONIX_BookProduct_XSD_schema+codes_Issue_18.zip this zip]
   # Unzip the the archive into a folder we'll refer to as *`XSD_HOME`*
-  # Make sure *`XSD_HOME`* contains the requested *`.xsd file`*, for instance: `ONIX_BookProduct_Release2.1_reference.xsd`
+  # Make sure *`XSD_HOME`* contains the requested *`.xsd`* file, for instance: `ONIX_BookProduct_Release2.1_reference.xsd`
   # In *`XSD_HOME`* create a text file, called *`bindings.xml`*, containing the lines: 
 {{{
 <bindings version="2.0" xmlns="http://java.sun.com/xml/ns/jaxb">
