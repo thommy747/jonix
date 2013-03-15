@@ -16,7 +16,7 @@ This scenario is demonstrated at Jonix home page.
 
 = Supporting new ONIX fields =
 
-Go over this tutorial to see how develop a new Product class, capable of handling ONIX fields other than the default.
+Go over [TutorialSupportNewFormats this tutorial] to see how develop a new Product class, capable of handling ONIX fields other than the default.
 
 
 = Supporting new output formats =
