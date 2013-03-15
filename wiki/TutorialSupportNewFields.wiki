@@ -1,8 +1,25 @@
-#summary One-sentence summary of this page.
+#summary How to support new types of ONIX fields
 
 = Introduction =
 
-Add your content here.
+In this tutorial we'll add the `Measure` composite of ONIX, which has the following typical form:
+{{{
+<Measure>
+	<MeasureTypeCode>01</MeasureTypeCode>
+	<Measurement>9.25</Measurement>
+	<MeasureUnitCode>in</MeasureUnitCode>
+</Measure>
+<Measure>
+	<MeasureTypeCode>02</MeasureTypeCode>
+	<Measurement>6.25</Measurement>
+	<MeasureUnitCode>in</MeasureUnitCode>
+</Measure>
+<Measure>
+	<MeasureTypeCode>03</MeasureTypeCode>
+	<Measurement>1.2</Measurement>
+	<MeasureUnitCode>in</MeasureUnitCode>
+</Measure>
+}}}
 
 
 = Details =
