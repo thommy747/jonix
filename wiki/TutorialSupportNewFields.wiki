@@ -2,7 +2,8 @@
 
 = Introduction =
 
-In this tutorial we'll add the `Measure` composite of ONIX, which has the following typical form:
+In this tutorial we'll add the `Measure` composite of ONIX, which describes the physical dimensions of a printed book. It has the following generalform:
+
 {{{
 <Measure>
 	<MeasureTypeCode>01</MeasureTypeCode>
@@ -21,10 +22,98 @@ In this tutorial we'll add the `Measure` composite of ONIX, which has the follow
 </Measure>
 }}}
 
+Being an ONIX composite, it repeats the same structure several times, each with its own values.
 
-= Details =
+= Part 1: The Consumer =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+The hardest part of supporting a new ONIX composite, is to develop its corresponding `JonixConsumer` - the class that will transform the above XML into an easy-to-use Java class. This transformation, actually, doesn't start with the XML string itself, but with a JAXB-generated Java representation of it. So we're facing a conversion from a very raw Java object into a more specific, Jonix-style object. This is exactly what `JonixConsumer` is all about.
+
+So we start by finding out how JAXB would generate the raw Java objects. Open `ONIX.java`, which is a huge enumerator spanning all supported ONIX packages, and look for the object `Measure`:
+
+{{{
+/**
+ * An optional and repeatable group of data elements which together identify a measurement and the units in which it is expressed.
+ * 
+ * @version
+ *          2.1.04, April 2011
+ * @version
+ *          3.0.01, January 2012
+ * @links
+ *        {@link org.editeur.onix.v21.references.Measure}<br/>
+ *        {@link org.editeur.onix.v21.shorts.Measure}<br/>
+ *        {@link org.editeur.onix.v30.references.Measure}<br/>
+ *        {@link org.editeur.onix.v30.shorts.Measure}<br/>
+ */
+Measure,
+}}}
+
+In its comment, there are links to several JAXB classes, all representing the `Measure` composites (in different versions/forms). For convenience, open the first, `org.editeur.onix.v21.references.Measure`, and look for the juicy parts:
+
+{{{
+...
+@XmlType(name = "", propOrder = {
+    "measureTypeCode",
+    "measurement",
+    "measureUnitCode"
+})
+@XmlRootElement(name = "Measure")
+public class Measure {
+
+    @XmlElement(name = "MeasureTypeCode", required = true)
+    protected MeasureTypeCode measureTypeCode;
+    @XmlElement(name = "Measurement", required = true)
+    protected Measurement measurement;
+    @XmlElement(name = "MeasureUnitCode", required = true)
+    protected MeasureUnitCode measureUnitCode;
+    ...
+}}}
+
+We see that the three items we're interested in (`measureTypeCode`, `measurement` and `measureUnitCode`) are all fields, and each has its own JAXB-generated type. The first, `measureTypeCode` is of type `MeasureTypeCode`, which, if you look at its implementation:
+  * has a single property, `value`, stored as a String
+  * refers to the code-list 48, as explained at the beginning of the class' comment  
+This code-list, like all code-lists, must have a corresponding Jonix enum in the package `org.jonix.codelist`. It can be located by the name and the comment it has. In this case, the Jonix enum from code-list 48 is the class `org.jonix.codelist.MeasureTypes`.
+
+Go ahead and explore the other two types by yourself. You'll see that the third property, `measureUnitCode` is of type `MeasureUnitCode`, which has a `value` property of type `List50`, which in turn has its own `value` property, containing the String that we're after.
+
+This is the kind of information needed to extract data from a raw JAXB object and convert it into a Jonix object. The class that would retain a single `Measure` record in our implementation is going to look like that:
+
+{{{
+public class Measure
+{
+	// we keep the members public and final, to avoid cumbersome getters/setters
+	public final MeasureTypes measureType;
+	public final double measurement;
+	public final MeasureUnits measureUnit;
+
+	public Measure(MeasureTypes measureType, double measurement, MeasureUnits measureUnit)
+	{
+		this.measureType = measureType;
+		this.measurement = measurement;
+		this.measureUnit = measureUnit;
+	}
+
+	@Override
+	public String toString()
+	{
+		return String.format("Measure %s = %.3f [%s]", measureType.name(), measurement, measureUnit.name());
+	}
+}
+}}}
+
+The composite class, however, is going to be a `List` of such objects. Not only that, but also it will have to implement `JonixConsumer` to "consume" the <Measure> tags during the parsing process. By convention in Jonix, an inner-class syntax is used, as follows:
+
+{{{
+public class Measures extends JonixComposite<Measures.Measure>
+{
+	public static class Measure implements Serializable
+	{
+		// show above
+	}
+
+	@Override
+	public JonixConsumer consume(Object o, Object parent, Object grandParent, JonixResolver resolver)
+	{
+		// coming up next..
+	}
+}
+}}}
