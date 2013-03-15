@@ -21,4 +21,4 @@ Go over this tutorial to see how develop a new Product class, capable of handlin
 
 = Supporting new output formats =
 
-Go over [https:TutorialSupportNewFields this tutorial] to see how create a new Exporter, for outputting the ONIX source in a custom format.
+Go over [TutorialSupportNewFields this tutorial] to see how create a new Exporter, for outputting the ONIX source in a custom format.
