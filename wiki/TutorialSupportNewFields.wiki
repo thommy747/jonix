@@ -148,11 +148,12 @@ The first `if` relies on the Jonix framework services. Given a `resolver`, which
 
 Once we know that the object `o` represents a `Measure` JAXB-object, we extract the three properties. Again, we use a Jonix framework service, called `getProperty(o, properties..)`, which, given the object `o`, accesses one of its field (provided by name). If this field value is expected to be an object, a second field name can be passed, and so on. For example, we've already established that the value of the `measureUnitCode` property is actually stored in a path which can be described as follows:
 
-`o --> "measureUnitCode" --> "value" --> "value"
+`o` --> "measureUnitCode" --> "value" --> "value"
 
 This path if passed to `getProperty()` just like that, with one exception: in the Short version of ONIX, the property names are different. To make our code generic, we use `resolver.onixPropOf()` which returns a version-depedant property name.
 
 Once we have all three parameters, we create a `new Measure()` and call `add()` which is derived from `LinkedList`. This way, when all `<Measure>` tags in the ONIX source have been consumed, we have a `List` of `Measure` items, containing the parsed content of the original tags.
+
 
 = Part 2: The Product and Factory =
 
@@ -195,4 +196,141 @@ public class MyFactory implements JonixFactory<BasicHeader, MyProduct>
 }
 }}}
 
+
 = Part 3: Formatting =
+
+For our subclass, `MyProduct` to take place benefit from Jonix formatting services (which is not mandatory), especially as tab-delimited text, we may want to implement the `JonixColumn<MyProduct>` interface. The best way to do it (although not the only one) is by using an enum that lists all the columns we wish to support (i.e. columns that will be available for tab-delimited rendering). We'll start with enum with one item:
+
+{{{
+public enum MyColumns implements JonixColumn<MyProduct>
+{
+	Measures
+	{
+		@Override
+		public int getRepetitions()
+		{
+			return 5;
+		}
+
+		@Override
+		public String[] getSubColumnNames()
+		{
+			return new String[]
+				{ "Measure", "Amount", "Unit" };
+		}
+
+		@Override
+		public boolean extractTo(String[] fieldData, MyProduct product)
+		{
+			int pos = 0;
+			for (Measure measure : product.measures)
+			{
+				fieldData[pos + 0] = measure.measureType.name();
+				fieldData[pos + 1] = String.format("%.3f", measure.measurement);
+				fieldData[pos + 2] = measure.measureUnit.name();
+				if ((pos += 3) == fieldData.length)
+					break;
+			}
+			return pos > 0;
+		}
+	};
+}
+}}}
+
+What the implementation means is that if `MyColumns.Measures` is included in a tab-delimited output, it would require 15 columns (for 5 types of measurements, each comprising 3 sub-columns: the measure-type, measure-value and measure-unit). Clearly, not all columns will always be filled. The outputting of the values into the 15-items long String array is performed in the implementation of `extractTo()`.
+
+A more useful service for end users would be to extract a specific type of measurement, say Height. This will require a single column whose content is consistent between executions, hence very useful for spreadsheets and databases. We extend our enum:
+
+{{{
+public enum MyColumns implements JonixColumn<MyProduct>
+{
+	Measures
+	{
+		// Unchanged
+	},
+
+	Height
+	{
+
+		@Override
+		public int getRepetitions()
+		{
+			return 1;
+		}
+
+		@Override
+		public String[] getSubColumnNames()
+		{
+			return new String[]
+				{ "Height", "HeightUnit" };
+		}
+
+		@Override
+		public boolean extractTo(String[] fieldData, MyProduct product)
+		{
+			Measure measure = product.findMeasure(MeasureTypes.Height);
+			if (measure != null)
+			{
+				fieldData[0] = String.format("%.3f", measure.measurement);
+				fieldData[1] = measure.measureUnit.name();
+				return true;
+			}
+			return false;
+		}
+	};
+}
+}}}
+
+The implementation relies of a look service at `MyProduct`:
+
+{{{
+public class MyProduct extends BasicProduct
+{
+	...
+	
+	public Measure findMeasure(MeasureTypes requestedType)
+	{
+		for (Measure measure : measures)
+		{
+			if (measure.measureType == requestedType)
+				return measure;
+		}
+		return null;
+	}
+}
+}}}
+
+
+= Part 4: Executing =
+
+Having defined all our classes, we can execute the following code, which reads an ONIX file and prints 3 columns of interest (including `Height`) as a tab-delimited text.
+
+{{{
+public static void main(String[] args)
+{
+	JonixTabDelimitedExporter<BasicHeader, MyProduct> exporter = new JonixTabDelimitedExporter<BasicHeader, MyProduct>(new MyFactory());
+	
+	exporter.setColumns((JonixColumn<MyProduct>[]) new JonixColumn<?>[]
+		{ BasicColumn.ISBN13, BasicColumn.Title, MyColumns.Height });
+		
+	exporter.scanFile(JonixPackages.v21_Reference, "C:\\OnixSource.xml");
+}
+}}}
+
+The columns order was explicitly stated in this example. Jonix allows the Product itself to define a default column set:
+
+{{{
+public class MyProduct extends BasicProduct
+{
+	...
+	
+	@Override
+	public <P extends JonixTagColumnable> JonixColumn<P>[] getDefaultColumns()
+	{
+		return (JonixColumn<P>[]) new JonixColumn<?>[]
+			{ BasicColumn.ISBN13, BasicColumn.Title, MyColumns.Height };
+	}
+=}
+}}}
+
+With this default, we can omit the `setColumns()` order in the `main()` method above.
