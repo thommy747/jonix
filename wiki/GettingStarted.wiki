@@ -1,4 +1,5 @@
 #summary Quick Start Guide
+#labels Featured
 
 Jonix can be used as-is in many typical use cases. However, there are several scenarios where you need to extend it:
   # You need more fields extracted from each ONIX record than what `BasicProduct` offers. In this case you'll need to develop new `JonixConsumer`s capable of extracting those fields from raw ONIX records.
