@@ -141,3 +141,7 @@ public JonixConsumer consume(Object o, Object parent, Object grandParent, JonixR
 	return null;
 }
 }}}
+
+The first `if` relies on the Jonix framework services. Given a `resolver`, which represents the specific ONIX version of the source, we can translate the object in question (passed as `o`) into an `ONIX` enum (which is shared among all ONIX versions). This enum is then compared to the enum object representing the tag we want to consume - `ONIX.Measure`.
+Once we know that `o` represents a `Measure` JAXB-object, we extract the three properties. Again, we use a Jonix framework service called `getProperty(o, properties..)` which, given the object `o`, accesses one of its field (provided by name). If this field value is expected to be another object, a second field name can be passed, and so on. For example, the `measureUnitCode` property value is actually stored in a path which can be described as follows:
+`o --> "measureUnitCode" --> "value" --> "value"
