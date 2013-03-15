@@ -118,6 +118,8 @@ public class Measures extends JonixComposite<Measures.Measure>
 }
 }}}
 
+Note that `JonixComposite<T>` extends `LinkedList<T>`, so our composite class, `Measures` is, in fact, a list of `Measure` items.
+
 The last thing left to do is to actually participate in the parsing process of an ONIX source and "snatch" the `Measure` tags into our composite class. The reader is encouraged to read the Javadocs pertaining to the parsing process in general and the consumption mechanism in particular (see the Javadocs for the interface `JonixConsumer` to begin with).
 In general lines, when the parser reaches a new top-tag (i.e. right below `<Product>`) it asks all the consumers, who "knows" how to consume it. When a consumer says "I do", it well be given an exclusive access to the tag as well as its child tags (NOTE: in `Measure` tag, all the information we need is parsed by JAXB into properties at the parent level, so we don't need to handle sub-tags. This is not the case in more complex composites, such as `Price` and `Series`, whose consumption code you can study). So we need to do the following in the `consume()` method:
   * find out whether the raw Java object in question is a `Measure` tag (remember, it has a different tag-name in the Short form)
@@ -144,6 +146,53 @@ public JonixConsumer consume(Object o, Object parent, Object grandParent, JonixR
 
 The first `if` relies on the Jonix framework services. Given a `resolver`, which represents the specific ONIX version of the source, we can translate the object in question (passed as `o`) into an `ONIX` enum (which is shared among all ONIX versions). This enum is then compared to the enum object representing the tag we want to consume - `ONIX.Measure`.
 
-Once we know that `o` represents a `Measure` JAXB-object, we extract the three properties. Again, we use a Jonix framework service called `getProperty(o, properties..)` which, given the object `o`, accesses one of its field (provided by name). If this field value is expected to be another object, a second field name can be passed, and so on. For example, the `measureUnitCode` property value is actually stored in a path which can be described as follows:
+Once we know that the object `o` represents a `Measure` JAXB-object, we extract the three properties. Again, we use a Jonix framework service, called `getProperty(o, properties..)`, which, given the object `o`, accesses one of its field (provided by name). If this field value is expected to be an object, a second field name can be passed, and so on. For example, we've already established that the value of the `measureUnitCode` property is actually stored in a path which can be described as follows:
 
 `o --> "measureUnitCode" --> "value" --> "value"
+
+This path if passed to `getProperty()` just like that, with one exception: in the Short version of ONIX, the property names are different. To make our code generic, we use `resolver.onixPropOf()` which returns a version-depedant property name.
+
+Once we have all three parameters, we create a `new Measure()` and call `add()` which is derived from `LinkedList`. This way, when all `<Measure>` tags in the ONIX source have been consumed, we have a `List` of `Measure` items, containing the parsed content of the original tags.
+
+= Part 2: The Product and Factory =
+
+We have a new `JonixConsumer` capable of processing the `<Measure>` tags. These tags are just part of a greater `<Product>` tag representing a while e-book metadata. In Jonix, the `<Product>` and `<Header>` root-tags are represented by a `JonixTag` class, which is, esentially, a container of `JonixConsumer`s who work together to consume the ONIX tags and populate the Product/Header.
+
+Now that we know how to consume the `<Measure>` tag, we need to combine that in the context of a Product class. While not mandatory, its only reasonable to extend an Product class which already takes care of other tags for us. Jonix comes with a `BasicProduct` and `BasicHeader` implementation which are obvious super-classes for any extension of the package.
+
+Here's what our Product class can look like:
+
+{{{
+public class MyProduct extends BasicProduct
+{
+	public MyProduct(JonixResolver resolver)
+	{
+		super(resolver);
+	}
+
+	public final Measures measures = new Measures();
+}
+}}}
+
+That's it! The default behavior at `JonixTag` class, just before parsing, is to go over all public members that implement `JonixConsumer` and add them to the consumers list. So simply by adding a public member of type `Measures`, our derived class, `MyProduct` will consume all the tags handled by `BasicProduct` as well as the `<Measure>` tag.
+
+To allow this subclass to be considered by the Jonix parser, we also have to provide a factory class, responsible for generating a Header class and a Product class whenever the parses needs these. In our case, as we are OK with the default Header class, `BasicHeader`, our factory looks like that:
+
+{{{
+public class MyFactory implements JonixFactory<BasicHeader, MyProduct>
+{
+	@Override
+	public BasicHeader newHeaderProcessor(JonixResolver resolver)
+	{
+		return new BasicHeader(resolver);
+	}
+	
+	@Override
+	public MyProduct newProductProcessor(JonixResolver resolver)
+	{
+		return new MyProduct(resolver);
+	}
+}
+}}}
+
+= Part 3: Formatting =
