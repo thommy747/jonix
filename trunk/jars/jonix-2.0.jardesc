@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
+<jardesc>
+    <jar path="jonix/jars/jonix-2.0.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/jonix/jars/jonix-2.0.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" mainClassHandleIdentifier="=jonix/src&lt;org.jonix{Jonix.java[Jonix" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=jonix/src&lt;org.editeur.onix.v21.references"/>
+        <javaElement handleIdentifier="=jonix/src&lt;org.jonix.element"/>
+        <javaElement handleIdentifier="=jonix/src&lt;org.jonix.codelist"/>
+        <javaElement handleIdentifier="=jonix/src&lt;org.editeur.onix.v30.references"/>
+        <javaElement handleIdentifier="=jonix/src&lt;org.jonix.basic"/>
+        <javaElement handleIdentifier="=jonix/src&lt;org.apache.commons.io"/>
+        <javaElement handleIdentifier="=jonix/src&lt;org.jonix.export"/>
+        <javaElement handleIdentifier="=jonix/src&lt;org.apache.commons.io.input"/>
+        <javaElement handleIdentifier="=jonix/src&lt;org.jonix.composite"/>
+        <javaElement handleIdentifier="=jonix/src&lt;org.editeur.onix.v21.shorts"/>
+        <javaElement handleIdentifier="=jonix/src&lt;org.editeur.onix.v30.shorts"/>
+        <javaElement handleIdentifier="=jonix/src&lt;org.jonix.resolve"/>
+        <javaElement handleIdentifier="=jonix/src&lt;org.jonix"/>
+    </selectedElements>
+</jardesc>

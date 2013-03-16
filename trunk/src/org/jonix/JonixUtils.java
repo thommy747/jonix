@@ -1,69 +1,80 @@
 package org.jonix;
 
-import java.io.PrintStream;
-import java.lang.reflect.Method;
-import java.util.LinkedList;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Auxiliary services to use primarily by Jonix classes, but also by its subclasses.
+ * 
+ * @author Zach Melamed
+ * 
+ */
 public class JonixUtils
 {
-	@SuppressWarnings("unchecked")
-	public static List<Object> getContent(Object onixObj)
+	private static boolean isFieldExists(Object onixObj, String fieldName)
 	{
-		return (List<Object>) invoke(onixObj, "getContent");
-	}
+		if (onixObj == null)
+			return false;
 
-	public static interface OnixObjectHandler
-	{
-		public boolean handleOnixObject(Object onixObj, Object parentOnixObj, Object grandParentOnixObj, int depth);
-	}
-
-	public static void forEach(Object onixRootObj, Object parentOnixObj, boolean recursive, int rootDepth, OnixObjectHandler handler)
-	{
-		List<Object> list = getContent(onixRootObj);
-		if (list != null)
-		{
-			rootDepth++;
-			for (Object obj : list)
-			{
-				boolean drillDown = handler.handleOnixObject(obj, onixRootObj, parentOnixObj, rootDepth);
-				if (recursive && drillDown)
-					forEach(obj, onixRootObj, recursive, rootDepth, handler);
-			}
-		}
-	}
-
-	public static void print(Object onixObj, final PrintStream out)
-	{
-		forEach(onixObj, null, true, 0, new OnixObjectHandler()
-		{
-			@Override
-			public boolean handleOnixObject(Object onixObj, Object parentOnixObj, Object grandParentOnixObj, int depth)
-			{
-				Object value = invoke(onixObj, "getValue");
-				String valueStr = (value != null) ? String.format(" [%s (%s)]", value.toString(), value.getClass().getSimpleName()) : "";
-				String spacer = (depth == 0) ? "" : new String(new char[depth]).replace("\0", "  ");
-				out.println(spacer + onixObj.getClass().getSimpleName() + valueStr);
-				return true;
-			}
-		});
-	}
-
-	private static Object invoke(Object o, String methodName)
-	{
-		Object retVal = null;
 		try
 		{
-			Method method = o.getClass().getMethod(methodName, (Class[]) null);
-			retVal = method.invoke(o, (Object[]) null);
+			onixObj.getClass().getDeclaredField(fieldName);
+		}
+		catch (NoSuchFieldException e)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	private static Object getFieldValue(Object onixObj, String fieldName) throws NoSuchFieldException, SecurityException,
+			IllegalArgumentException, IllegalAccessException
+	{
+		if (onixObj == null)
+			return null;
+
+		Field field = onixObj.getClass().getDeclaredField(fieldName);
+		field.setAccessible(true);
+		return field.get(onixObj);
+	}
+
+	private static Object invokeMethodOf(Object onixObj, String methodName) throws IllegalAccessException, InvocationTargetException,
+			NoSuchMethodException
+	{
+		if (onixObj == null)
+			return null;
+
+		return onixObj.getClass().getMethod(methodName).invoke(onixObj);
+	}
+
+	public static Object getProperty(Object onixObj, String... propertyPath)
+	{
+		try
+		{
+			for (String propertyName : propertyPath)
+			{
+				if (propertyName.endsWith("()"))
+					onixObj = invokeMethodOf(onixObj, propertyName.substring(0, propertyName.length() - 2));
+				else
+					onixObj = getFieldValue(onixObj, propertyName);
+			}
+			return onixObj;
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
+			return null;
 		}
-		return retVal;
 	}
 
-	public static String contentToString(Object onixObj)
+	public static String getValueAsStr(Object onixObj)
+	{
+		return (String) getProperty(onixObj, "value");
+	}
+
+	public static String getContentAsStr(Object onixObj)
 	{
 		List<Object> content = getContent(onixObj);
 		if (content != null)
@@ -73,43 +84,37 @@ public class JonixUtils
 				if (obj != null)
 					sb.append(obj.toString());
 			return sb.toString();
-
 		}
 		return null;
 	}
 
-	public static List<String> enumListToStringArray(List<? extends Object> enumList, boolean returnValueField)
+	@SuppressWarnings("unchecked")
+	public static List<Object> getContent(Object onixObj)
 	{
-		List<String> result = new LinkedList<String>();
-		for (Object obj : enumList)
-			if (obj != null)
-				result.add(returnValueField ? invoke(obj, "value").toString() : obj.toString());
-			else
-				// NOTE: maybe we need to warn - this is situation where an enum value in the file (for instance, country code) doesn't conform to the ONIX
-				// codelist as defined in the Xml Schema. the value "ROW" used as a country code is a known example
-				;
+		return isFieldExists(onixObj, "content") ? (List<Object>) getProperty(onixObj, "content") : null;
+	}
+
+	public static List<String> enumValueToStringArray(Object o, boolean returnValueProperty)
+	{
+		List<String> result = new ArrayList<String>();
+		List<?> enumList = (List<?>) getProperty(o, "value");
+		if (enumList != null)
+			for (Object obj : enumList)
+			{
+				if (obj != null)
+					result.add(returnValueProperty ? getValueAsStr(obj) : obj.toString());
+				else
+					// NOTE: maybe we need to warn - this is situation where an enum value in the file (for instance, country code) doesn't
+					// conform to the ONIX
+					// codelist as defined in the Xml Schema. the value "ROW" used as a country code is a known example
+					;
+			}
 		return result;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static Object[] getChildren(Object onixObj, Class[] childrenClass)
+	public static String noBreaks(String s)
 	{
-		Object[] result = new Object[childrenClass.length];
-		List<Object> list = getContent(onixObj);
-		if (list != null)
-		{
-			for (Object obj : list)
-			{
-				for (int i = 0; i < childrenClass.length; i++)
-				{
-					if (obj.getClass() == childrenClass[i])
-					{
-						result[i] = obj; // invoke(obj, "getValue")
-						break;
-					}
-				}
-			}
-		}
-		return result;
+		return (s == null || s.isEmpty()) ? s : s.replaceAll("\\t|\\n|\\r", " ");
 	}
+
 }
