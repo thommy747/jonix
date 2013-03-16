@@ -12,13 +12,14 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLFilterImpl;
 
 /**
- * A bridge between SAX and JAXB used internally to prevent JAXB from reading the entire ONIX file it unmarshalls into memory.
- * Another function provided by this filter is the manual injection of the correct XML namespace expected by ONIX tags, even if the file itself doesn't contain
- * them.<br/>
- * The implementation of this class was inspired by the <i>partial-unmarshalling</i> demo application provided with the <a href="http://jaxb.java.net">JAXB
- * Reference Implementation</a>. The idea is simple - use SAX, not JAXB, to read the entire document, but along the way, make as many 'small' and short-lived
- * instances of JAXB parser (a.k.a <code>Unmarshaller</code>) as needed, to deal with parsing of local, safe-contained tags (i.e. <code>PRODUCT</code>, for
- * instance).
+ * A bridge between SAX and JAXB used internally to prevent JAXB from reading the entire ONIX file it unmarshalls into memory. Another
+ * function provided by this filter is the manual injection of the correct XML namespace expected by ONIX tags, even if the file itself
+ * doesn't contain them.
+ * <p>
+ * The implementation of this class was inspired by the <i>partial-unmarshalling</i> demo application provided with the <a
+ * href="http://jaxb.java.net">JAXB Reference Implementation</a>. The idea is simple - use SAX, not JAXB, to read the entire document, but
+ * along the way, make as many 'small' and short-lived instances of JAXB parser (a.k.a <code>Unmarshaller</code>) as needed, to deal with
+ * parsing of local, safe-contained tags (i.e. <code>PRODUCT</code>, for instance).
  * 
  * @author Zach Melamed
  * 
@@ -59,7 +60,8 @@ public class JonixChunksHandler extends XMLFilterImpl
 		// only top-level elements require special treatment
 		if (depth == 1)
 		{
-			// we started a top-level element (HEADER or PRODUCT) in SAX, now we create a new, short-lived, instance of JAXB parser (Unmarshaller) to
+			// we started a top-level element (HEADER or PRODUCT) in SAX, now we create a new, short-lived, instance of JAXB parser
+			// (Unmarshaller) to
 			// handle only the internal content of this top-level tag
 			Unmarshaller unmarshaller;
 			try
@@ -71,14 +73,15 @@ public class JonixChunksHandler extends XMLFilterImpl
 				throw new SAXException(e);
 			}
 
-			// technically, we trick JAXB into thinking that this tag is in fact the beginning of a new XML document 
+			// technically, we trick JAXB into thinking that this tag is in fact the beginning of a new XML document
 			unmarshallerHandler = unmarshaller.getUnmarshallerHandler();
 			setContentHandler(unmarshallerHandler);
 			unmarshallerHandler.startDocument();
 			unmarshallerHandler.setDocumentLocator(locator);
 		}
 
-		// when internal tags (below top-level) start, we simply let the SAX reader progress, with the JAXB-unmarshaller being the content handler 
+		// when internal tags (below top-level) start, we simply let the SAX reader progress, with the JAXB-unmarshaller being the content
+		// handler
 		super.startElement(globalNS, localName, qName, atts);
 		depth++;
 	}
@@ -98,7 +101,8 @@ public class JonixChunksHandler extends XMLFilterImpl
 			setContentHandler(nullHandler);
 			try
 			{
-				Object onixObj = unmarshallerHandler.getResult(); // parses the top-level tag (and children) passed to it as a virtual XML document
+				Object onixObj = unmarshallerHandler.getResult(); // parses the top-level tag (and children) passed to it as a virtual XML
+																	// document
 				onChunkListener.onChunk(onixObj);
 			}
 			catch (JAXBException je)
