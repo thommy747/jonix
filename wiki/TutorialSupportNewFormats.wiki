@@ -2,7 +2,7 @@
 
 = Introduction =
 
-Following is a useful and simple example of how to derive a custom exporter. In this case, instead of generating a tab-delimited text, we generate an SQL file, consisting of INSERT statements.
+Following is a useful and simple example of how to derive a custom exporter. In this case, instead of generating a tab-delimited text, we generate an SQL file, consisting of INSERT statements. We override the method `onExportUniqueList()` where the exporting itself takes place.
 
 = Details =
 
