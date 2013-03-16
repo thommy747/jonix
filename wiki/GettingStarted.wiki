@@ -42,9 +42,29 @@ exporter.scanFile(JonixPackages.v30_Reference, "C:\\myOnix2file.onx", "UTF16");
 }}}
 
 
-If your goal is NOT to export the ONIX source(s), but to do something programmatic with it (search for a record, count records that meet specific criteria, etc.) - the exporters are not your best choice. What you're probably looking for in these cases is to subclass the core class `JonixScanner` directly, as shown in the project home page:
+If your goal is NOT to export the ONIX source(s), but to do something programmatic with it (search for a record, count records that meet specific criteria, etc.) - the exporters are not your best choice. What you're probably looking for in these cases is to subclass the core class `JonixFilesScanner` directly, as shown in the project home page:
 
 {{{
+// initialize a scanner object, capable of reading ONIX records one by one
+JonixFilesScanner<BasicHeader, BasicProduct> scanner = new JonixFilesScanner<BasicHeader, BasicProduct>(new BasicFactory())
+{
+	@Override
+	protected void onHeader(BasicHeader header)
+	{
+		// ONIX-Header was processed, do something with the data..
+	}
+
+	@Override
+	protected void onProduct(BasicProduct product, int index)
+	{
+		// ONIX-Product (i.e. e-book) was processed, do something with the data..
+	}
+};
+
+// having defined the scanner, we can use it to process ONIX sources of various types and locations 
+scanner.scanFile(JonixPackages.v21_Reference, "MyOnix21.xml");
+scanner.scanFile(JonixPackages.v21_Short, "MyOnix21-Short.xml");
+scanner.scanFolder(JonixPackages.v30_Reference, "MyOnix30Folder", ".xml");
 }}}
 
 = Supporting new ONIX fields =
