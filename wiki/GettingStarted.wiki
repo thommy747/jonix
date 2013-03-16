@@ -2,15 +2,29 @@
 #labels Featured
 
 Jonix can be used as-is in many typical use cases. However, there are several scenarios where you need to extend it:
-  # You need more fields extracted from each ONIX record than what `BasicProduct` offers. In this case you'll need to develop new `JonixConsumer`s capable of extracting those fields from raw ONIX records.
-  # You need a different output format than what Jonix's canned exporters have to offer (these can be found under `org.jonix.export`). In this case you'll need to subclass the closest exporter and override the mothod that does the actual printing.
+  # You need more fields extracted from each ONIX record than what Jonix's built-in `BasicProduct` offers. In this case you'll need to develop new `JonixConsumer`s capable of extracting those fields from raw ONIX records.
+  # You need a different output format than what Jonix's canned exporters have to offer (these can be found under `org.jonix.export`). In this case you'll need to subclass the closest exporter and override proper method (based on your needs).
   # You need to scan non file-system sources (such as DB, network, etc.). In this case you'll need to subclass `JonixScanner` and provide wrapper methods that find and pull the data from wherever it is, and hand it over to the `scan` method as `InputStream`.
 
 
 = Typical Use Cases =
 
 If what you need is to retrieve the basic fields of ONIX sources stored on the file-system, and then output them as a plain list (in memory or file) or as a tab-delimited text-file, using Jonix is straightforward.
-Pick one of the sub-classes of `JonixFilesExport` that suits you needs (they're all well documented), and instantiate it using `BasicHeader`, `BasicProduct` and `new BasicFactory()` as parameters. 
+
+If your goal is to export the ONIX contents into text, pick one of the sub-classes of `JonixFilesExport` that suits you needs (they're all well documented), and instantiate it using `BasicHeader`, `BasicProduct` and `new BasicFactory()` as parameters. For your convenience, there's a static service creating each of them in the `Jonix` class.
+
+Example: read ONIX source(s) into a `List` - use the `JonixInMemExporter`, like that:
+
+{{{
+		// allocate a List to retain the products parsed from the ONIX source(s)
+		List<BasicProduct> outputProducts = new ArrayList<BasicProduct>();
+		
+		// create the exporter, passing it the target List and the log target (null means System.err)
+		JonixInMemExporter<BasicHeader, BasicProduct> exporter = Jonix.createBasicInMemExporter(outputProducts, null);
+		
+		// scan a particular source, in this case a folder of .xml files formatted as v2.1-Short ONIX
+		exporter.scanFolder(JonixPackages.v21_Short, "C:\\onixFiles", ".xml");
+}}}
 
 This scenario is demonstrated at Jonix home page.
 
