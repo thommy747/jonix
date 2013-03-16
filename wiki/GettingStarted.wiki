@@ -70,9 +70,9 @@ scanner.scanFolder(JonixPackages.v30_Reference, "MyOnix30Folder", ".xml");
 
 = Supporting new ONIX fields =
 
-Go over [TutorialSupportNewFields this tutorial] to see how develop a new Product class, capable of handling ONIX fields other than the default.
+Check out [TutorialSupportNewFields this tutorial] to see how develop a new Product class, capable of handling ONIX fields other than the default.
 
 
 = Supporting new output formats =
 
-Go over [TutorialSupportNewFormats this tutorial] to see how create a new Exporter, for outputting the ONIX source in a custom format.
+Check out [TutorialSupportNewFormats this tutorial] to see how create a new Exporter, for outputting the ONIX source in a custom format.
