@@ -11,23 +11,41 @@ Jonix can be used as-is in many typical use cases. However, there are several sc
 
 If what you need is to retrieve the basic fields of ONIX sources stored on the file-system, and then output them as a plain list (in memory or file) or as a tab-delimited text-file, using Jonix is straightforward.
 
-If your goal is to export the ONIX contents into text, pick one of the sub-classes of `JonixFilesExport` that suits you needs (they're all well documented), and instantiate it using `BasicHeader`, `BasicProduct` and `new BasicFactory()` as parameters. For your convenience, there's a static service creating each of them in the `Jonix` class.
+If your goal is to export the ONIX contents into text/memory, pick one of the sub-classes of `JonixFilesExport` that suits you needs (they're all well documented), and instantiate it using `BasicHeader`, `BasicProduct` and `new BasicFactory()` as parameters. For your convenience, there's a static service creating each of them in the `Jonix` class.
 
-Example: read ONIX source(s) into a `List` - use the `JonixInMemExporter`, like that:
+*Example 1*: to read ONIX source(s) into an `ArrayList`, use the `JonixInMemExporter`, like that:
 
 {{{
-		// allocate a List to retain the products parsed from the ONIX source(s)
-		List<BasicProduct> outputProducts = new ArrayList<BasicProduct>();
-		
-		// create the exporter, passing it the target List and the log target (null means System.err)
-		JonixInMemExporter<BasicHeader, BasicProduct> exporter = Jonix.createBasicInMemExporter(outputProducts, null);
-		
-		// scan a particular source, in this case a folder of .xml files formatted as v2.1-Short ONIX
-		exporter.scanFolder(JonixPackages.v21_Short, "C:\\onixFiles", ".xml");
+// allocate a List to retain the products parsed from the ONIX source(s)
+List<BasicProduct> outputProducts = new ArrayList<BasicProduct>();
+
+// create the exporter, passing it the target List and the log target (null means System.err)
+JonixInMemExporter<BasicHeader, BasicProduct> exporter = Jonix.createBasicInMemExporter(outputProducts, null);
+
+// scan a particular source, in this case a folder of .xml files formatted as v2.1-Short ONIX
+exporter.scanFolder(JonixPackages.v21_Short, "C:\\onixFiles", ".xml");
 }}}
 
-This scenario is demonstrated at Jonix home page.
 
+*Example 2*: to output ONIX source(s) into a tab-delimited text file, where each ISBN appears once (only the latest occurrence is chosen if there are several), use the `JonixInMemExporter`, like that:
+
+{{{
+// set the output stream - a file in this case
+PrintStream outputFile = new PrintStream("C:\\output.csv");
+
+// create the exporter
+exporter = Jonix.createBasicUniqueExporter(outputFile, null);
+
+// scan two ONIX files, with different characteristics
+exporter.scanFile(JonixPackages.v21_Reference, "C:\\myOnix2file.onx");
+exporter.scanFile(JonixPackages.v30_Reference, "C:\\myOnix2file.onx", "UTF16");
+}}}
+
+
+If your goal is NOT to export the ONIX source(s), but to do something programmatic with it (search for a record, count records that meet specific criteria, etc.) - the exporters are not your best choice. What you're probably looking for in these cases is to subclass the core class `JonixScanner` directly, as shown in the project home page:
+
+{{{
+}}}
 
 = Supporting new ONIX fields =
 
